@@ -23,7 +23,6 @@
     },
     "require": {
         "eveseat/services": "^3.0",
-        "eveseat/eveapi": "^3.0",
-        "laravel/framework": "5.5.*"
+        "eveseat/eveapi": "^3.0"
     }
 }
