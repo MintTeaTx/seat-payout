@@ -30,6 +30,6 @@ class PayoutServiceProvider extends ServiceProvider
     public function register()
     {
         //
-    $this->mergeConfigFrom(__DIR__ . '/Config/payout.sidebar.php','payout.sidebar');
+    $this->mergeConfigFrom(__DIR__ . '/Config/payout.sidebar.php','package.sidebar');
     }
 }
