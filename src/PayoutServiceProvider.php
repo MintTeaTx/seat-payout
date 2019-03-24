@@ -24,9 +24,7 @@ class PayoutServiceProvider extends ServiceProvider
      */
     public function add_routes()
     {
-        if (! $this->app->routesAreChached()) {
-            include __DIR__ .'Http/routes.php';
-        }
+        $this->loadRoutesFrom(__DIR__ . '/Http/routes.php');
     }
 
     public function register()
