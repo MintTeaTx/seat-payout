@@ -1,0 +1,29 @@
+{
+    "name": "fordav3/seat-mining-payout",
+    "description": "Gives you a tool to calculate mining payouts based on fleet logs",
+    "type": "seat-plugin",
+    "authors": [
+        {
+            "name": "Evelyn Rollins",
+            "email": "fordav3@gmail.com"
+        }
+    ],
+    "minimum-stability": "alpha",
+    "autoload": {
+        "psr-4": {
+            "Fordav3\\Seat\\Payout\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Fordav3\\Seat\\Payout\\PayoutServiceProvider"
+            ]
+        }
+    },
+    "require": {
+        "eveseat/services": "^3.0",
+        "eveseat/eveapi": "^3.0",
+        "laravel/framework": "5.5.*"
+    }
+}
