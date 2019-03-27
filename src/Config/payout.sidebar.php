@@ -13,7 +13,7 @@ return [
         'route_segment' => 'payout',
         'icon' => 'fa_rocket',
         'entries' =>    [
-            'payout' =>[
+            [
                 'name' => 'Payout Calculator',
                 'icon' => 'fa-rocket',
                 'route_segment' => 'payout',

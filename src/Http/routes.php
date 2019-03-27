@@ -16,6 +16,11 @@ Route::group(['namespace'=>'Fordav3\Seat\Payout\Http\Controllers',
                'uses' => 'PayoutController@getPayoutView',
                'middleware' => 'bouncer:payout.view'
            ]);
+            Route::post('/savePayout', [
+                'as' => 'payout.savePayout',
+                'uses' => 'PayoutController@buildPayoutTable',
+                'middleware' => 'bouncer:payout.request'
+            ]);
         });
 
 });

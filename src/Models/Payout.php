@@ -6,13 +6,16 @@
  * Time: 12:38 AM
  */
 
-namespace Fordav3\Seat\Models;
+namespace Fordav3\Seat\Payout\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-
 class Payout extends Model
 {
-    public $fillable = ['character_id', 'item', 'quantity', 'isk'];
+    protected $table = 'seat_payout_payouts';
+
+    public $primaryKey = 'user_id';
+
+    public $fillable = ['user_id','item', 'quantity'];
 
 }
