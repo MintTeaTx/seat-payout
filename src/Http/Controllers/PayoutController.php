@@ -17,11 +17,14 @@ class PayoutController extends Controller
     function getPayoutView()
     {
         $payouts = [];
+
+        Payout::truncate();
         return view('payout::payout', compact('payouts'));
     }
 
     function buildPayoutTable(SavePayout $request)
     {
+        Payout::truncate();
         $fleetlog = $request->fleetLog;
         $logarray = explode("\n", $fleetlog);
         $payouts = [];
@@ -29,25 +32,35 @@ class PayoutController extends Controller
         foreach ($logarray as $entry)
         {
             $payout =$this->buildPayout($entry);
-            $payouts[$payout->getKey()];
+            $payouts = Payout::all();
         }
 
-        return redirect()->back();
+        return view('payout::payout', compact('payouts'));
     }
     function buildPayout($entry)
     {
 
         $regex= '#^\d\d:\d\d:\d\d (?<charname>(\w|\s)+)\shas\slooted\s(?<quantity>(\d|,)+)\sx\s(?<item>(\w|\s)+)$#';
-        $payout = new Payout;
+        //$payout = new Payout;
         preg_match($regex,$entry,$values);
         $character_name = $values['charname'];
         $character = CharacterInfo::where('name', $character_name)->first();
-        $user = $this->getUser($character->getKey());
-	
+        $quantity = number_format(floatval($values['quantity']));
+
         $character = $this->getMainCharacter($character);
-        $payout = Payout::updateOrCreate(['user_id' => $user->getKey(), 'item' => $values['item'], 'quantity'=>$values['quantity']]);
+
+
+        if(Payout::where('character_name', $character->name)->where('item', $values['item'])->exists())
+        {
+            $payout = Payout::where('character_name', $character->name)->where('item', $values['item'])->first();
+            $payout->quantity = $payout->quantity + $quantity;
+            $payout->save();
+            return $payout;
+        }
+        $payout = Payout::updateOrCreate(['character_name' => (string)$character->name, 'item' => $values['item'], 'quantity'=>$quantity]);
         return $payout;
     }
+    //TODO: Remove dummy number and implement market data
     function getItemPrice($item)
     {
         return 150;

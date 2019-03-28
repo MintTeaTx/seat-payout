@@ -1,7 +1,7 @@
 
 @extends('web::layouts.grids.4-4-4')
 @section('title',trans('payout::payout.list'))
-@section('page_header', 'Vol it doesn\'t work yet but it will')
+@section('page_header', 'Vol it\'s like mostly working holy fuck')
 
 @section('left')
     <div class="box box-primary box-solid">
@@ -32,23 +32,19 @@
             <table id='payoutlist' class="table table-hover" style="vertical-align: top">
                 <thead>
                 <tr>
-                    <th></th>
                     <th>Character</th>
                     <th>Item Name</th>
+                    <th>Quantity</th>
                     <th>ISK</th>
-                    <th class="pull-right">Option</th>
+
                 </tr>
                 </thead>
                 <tbody>
                 @if (count($payouts) > 0)
                     @foreach($payouts as $payout)
                         <tr>
-                            <td data-order=" {{ $payout->character_id }}">
-                                <a href="{{ route('payout.view.sheet', ['character_id' => $payout->character_id]) }}">
-                                    <span class="id-to-name" data-id="{{ $payout['user_id']}}">{{ trans('web::seat.unknown') }}</span>
-                                </a>
-                            </td>
-                            <td class="text-right" data-order="{{ $payout['item'] }}">{{ $payout['item'] }}</td>
+                            <td>{{ (string)$payout['character_name'] }}</td>
+                            <td data-order="{{ $payout['item'] }}">{{ $payout['item'] }}</td>
                             <td class="text-right" data-order="{{ $payout['quantity'] }}">{{ number($payout['quantity'], 0) }} m<sup>3</sup></td>
                         </tr>
                     @endforeach

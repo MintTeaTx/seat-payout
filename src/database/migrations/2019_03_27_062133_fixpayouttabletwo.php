@@ -16,11 +16,13 @@ class Fixpayouttabletwo extends Migration
         //
 	Schema::dropIfExists('seat_payout_payouts');
 	Schema::create('seat_payout_payouts', function (Blueprint $table) {
-            $table->integer('user_id');
+	        $table->string('character_name');
             $table->string('item');
             $table->integer('quantity');
             $table->timestamps();
-            $table->primary('user_id');
+            $table->primary(['character_name','item']);
+
+
         });
     }
 

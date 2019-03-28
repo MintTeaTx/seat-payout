@@ -14,8 +14,10 @@ class Payout extends Model
 {
     protected $table = 'seat_payout_payouts';
 
-    public $primaryKey = 'user_id';
+    public $incrementing = false;
 
-    public $fillable = ['user_id','item', 'quantity'];
+    public $primaryKey = 'character_name';
+
+    public $fillable = ['character_name','item', 'quantity'];
 
 }
