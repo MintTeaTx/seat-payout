@@ -31,8 +31,13 @@ class PayoutController extends Controller
 
         foreach ($logarray as $entry)
         {
-            $payout =$this->buildPayout($entry);
-            $payouts = Payout::all();
+            $build = $this->buildPayout( $entry );
+            $payout = array(
+                'character_name' => $build->character_name,
+                'item' => $build->item,
+                'quantity' => $build->quantity
+            );
+            $payouts[ $build->item ] = $payout;
         }
 
         return view('payout::payout', compact('payouts'));
