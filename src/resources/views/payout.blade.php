@@ -40,13 +40,16 @@
                 </tr>
                 </thead>
                 <tbody>
-                @if (count($payouts) > 0)
-                    @foreach($payouts as $payout)
-                        <tr>
-                            <td>{{ (string)$payout['character_name'] }}</td>
-                            <td data-order="{{ $payout['item'] }}">{{ $payout['item'] }}</td>
-                            <td class="text-right" data-order="{{ $payout['quantity'] }}">{{ number($payout['quantity'], 0) }} m<sup>3</sup></td>
-                        </tr>
+                @if ( count( $payouts ) > 0 )
+                    @foreach( $payouts as $charname => $items )
+                        @foreach ( $items as $item => $details )
+                            <tr>
+                                <td>{{ (string) $charname }}</td>
+                                <td data-order="{{ $item }}">{{ $item }}</td>
+                                <td class="text-right" data-order="{{ $details['quantity'] }}">{{ number( $details['quantity'], 0 ) }}</td>
+                                <td class="text-right" data-order="{{ $details['isk'] }}">{{ number( $details['isk'], 0 ) }}</td>
+                            </tr>
+                        @endforeach
                     @endforeach
                 @endif
                 </tbody>
