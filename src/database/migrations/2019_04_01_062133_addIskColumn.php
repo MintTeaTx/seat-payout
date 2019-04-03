@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class Fixpayouttabletwo extends Migration
+class AddIskColumn extends Migration
 {
     /**
      * Run the migrations.
@@ -19,6 +19,7 @@ class Fixpayouttabletwo extends Migration
 	        $table->string('character_name');
             $table->string('item');
             $table->integer('quantity');
+            $table->integer('isk');
             $table->timestamps();
             $table->primary(['character_name','item']);
 

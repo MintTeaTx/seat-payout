@@ -45,5 +45,6 @@ class PayoutServiceProvider extends ServiceProvider
     {
         //
     $this->mergeConfigFrom(__DIR__ . '/Config/payout.sidebar.php','package.sidebar');
+        $this->mergeConfigFrom(__DIR__ . '/Config/payout.permissions.php','web.permissions');
     }
 }

@@ -18,6 +18,8 @@ class Payout extends Model
 
     public $primaryKey = 'character_name';
 
-    public $fillable = ['character_name','item', 'quantity'];
+    public $fillable = ['character_name','item', 'quantity', 'isk'];
+
+
 
 }

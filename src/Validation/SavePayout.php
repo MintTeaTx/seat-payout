@@ -18,6 +18,6 @@ class SavePayout extends FormRequest
     }
     public function rules()
     {
-        return ['fleetLog' => 'required|string'];
+        return [['fleetLog' => 'required|string'],['haulerList' => 'string']];
     }
 }

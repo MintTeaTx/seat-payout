@@ -14,6 +14,11 @@
                 <label>Fleet Log Paste Box</label>
                 <textarea name="fleetLog" id="fleetLog" rows="15" style="width: 100%" onclick="this.focus();this.select();"> </textarea>
             </div>
+            <div class="box-body">
+                {{ csrf_field() }}
+                <label>Fleet Log Paste Box</label>
+                <textarea name="haulerList" id="haulerList" rows="3" style="width: 100%" onclick="this.focus();this.select();"> </textarea>
+            </div>
             <div class='box-footer'>
                 <div class="btn-group pull-right" role="group">
                     <input type="submit" class="btn-primary" id="savePayout" value="Submit Log"/>
@@ -40,19 +45,36 @@
                 </tr>
                 </thead>
                 <tbody>
-                @if ( count( $payouts ) > 0 )
-                    @foreach( $payouts as $charname => $items )
-                        @foreach ( $items as $item => $details )
-                            <tr>
-                                <td>{{ (string) $charname }}</td>
-                                <td data-order="{{ $item }}">{{ $item }}</td>
-                                <td class="text-right" data-order="{{ $details['quantity'] }}">{{ number( $details['quantity'], 0 ) }}</td>
-                                <td class="text-right" data-order="{{ $details['isk'] }}">{{ number( $details['isk'], 0 ) }}</td>
-                            </tr>
-                        @endforeach
+                @if (count($payouts) > 0)
+                    @foreach($payouts as $payout)
+                        <tr>
+                            <td>{{ (string)$payout['character_name'] }}</td>
+                            <td data-order="{{ $payout['item'] }}">{{ $payout['item'] }}</td>
+                            <td class="text-right" data-order="{{ $payout['quantity'] }}">{{ number($payout['quantity'], 0) }} </td>
+                            <td class="text-right" data-order="{{$payout['isk'] }}"> {{ number($payout['isk']) }}</td>
+                        </tr>
                     @endforeach
                 @endif
                 </tbody>
+            </table>
+            <table id="haulerTable" class="table table-hover" style="vertical-align: top">
+                <thead>
+                <tr>
+                    <th>
+                        Hauler
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                @if (count($haulerarray) > 0)
+                    @foreach($haulerarray as $hauler)
+                        <tr>
+                            <td>{{ $hauler }}</td>
+                        </tr>
+                        @endforeach
+                @endif
+                </tbody>
+
             </table>
         </div>
     </div>

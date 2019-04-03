@@ -11,7 +11,7 @@ return [
         'name'=>'Fleet Payout Calculator',
         'permission' => 'payout.view',
         'route_segment' => 'payout',
-        'icon' => 'fa_rocket',
+        'icon' => 'fa_calculator',
         'entries' =>    [
             [
                 'name' => 'Payout Calculator',
