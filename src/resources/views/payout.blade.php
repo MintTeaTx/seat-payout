@@ -16,7 +16,7 @@
             </div>
             <div class="box-body">
                 {{ csrf_field() }}
-                <label>Fleet Log Paste Box</label>
+                <label>Hauler Exclusion Paste Box</label>
                 <textarea name="haulerList" id="haulerList" rows="3" style="width: 100%" onclick="this.focus();this.select();"> </textarea>
             </div>
             <div class='box-footer'>
