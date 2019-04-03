@@ -1,4 +1,5 @@
 <?php
+
 namespace Fordav3\Seat\Payout\Http\Controllers;
 use Fordav3\Seat\Payout\Validation\SavePayout;
 use Illuminate\Http\Request;
@@ -10,69 +11,81 @@ use Fordav3\Seat\Payout\Models\Payout;
 use Seat\Eveapi\Models\Character\CharacterInfo;
 use Seat\Services\Repositories\Character\Info;
 
-class PayoutController extends Controller
-{
+class PayoutController extends Controller {
     use UserRepository;
 
-    function getPayoutView()
-    {
+    function getPayoutView() {
         $payouts = [];
-
         Payout::truncate();
         return view('payout::payout', compact('payouts'));
     }
 
-    function buildPayoutTable(SavePayout $request)
-    {
+    function buildPayoutTable(SavePayout $request) {
         Payout::truncate();
         $fleetlog = $request->fleetLog;
         $logarray = explode("\n", $fleetlog);
         $payouts = [];
-
-        foreach ($logarray as $entry)
-        {
-            $payout =$this->buildPayout($entry);
-            $payouts = Payout::all();
+        foreach ( $logarray as $entry ) {
+            $build = $this->buildPayout( $entry );
+            if ( is_object( $build ) ) {
+                 $payout = array(
+                     'character_name' => $build->character_name,
+                     'item' => $build->item,
+                     'quantity' => $build->quantity
+                 );
+                 $payouts[ $build->character_name ][ $build->item ] = array(
+                    'quantity' => $build->quantity,
+                    'isk' => ( $build->quantity * $this->getItemPrice( $build->item ) )
+               );
+            }
         }
-
         return view('payout::payout', compact('payouts'));
     }
-    function buildPayout($entry)
-    {
 
-        $regex= '#^\d\d:\d\d:\d\d (?<charname>(\w|\s)+)\shas\slooted\s(?<quantity>(\d|,)+)\sx\s(?<item>(\w|\s)+)$#';
-        //$payout = new Payout;
-        preg_match($regex,$entry,$values);
-        $character_name = $values['charname'];
-        $character = CharacterInfo::where('name', $character_name)->first();
-        $quantity = number_format(floatval($values['quantity']));
+    function buildPayout( $entry ) {
+          $formats = array(
+               'window' => '#^(?<stamp>[\d:]*)?\s(?<charname>.*?)has looted\s(?<quantity>\d*)\sx\s(?<item>.*?)$#',
+               'file'   => '#^(?<stamp>[\d:.\s]*)?\t(?<charname>.*?)\t(?<item>.*?)\t(?<quantity>\d*)\t.*?$#'
+          );
+          foreach ( $formats as $type => $regex ) {
+               preg_match( $regex, $entry, $values );
+               if (
+                    ! empty( $values )
+                    && array_key_exists( 'charname', $values )
+                    && array_key_exists( 'quantity', $values )
+                    && array_key_exists( 'item', $values )
+               ) {
+                    $item = preg_replace( "/\r|\n/", "", $values['item'] );
+                    $character_name = $values['charname'];
+                    $character = CharacterInfo::where('name', $character_name)->first();
+                    $quantity = number_format(floatval($values['quantity']));
+                    $character = $this->getMainCharacter($character);
 
-        $character = $this->getMainCharacter($character);
-
-
-        if(Payout::where('character_name', $character->name)->where('item', $values['item'])->exists())
-        {
-            $payout = Payout::where('character_name', $character->name)->where('item', $values['item'])->first();
-            $payout->quantity = $payout->quantity + $quantity;
-            $payout->save();
-            return $payout;
-        }
-        $payout = Payout::updateOrCreate(['character_name' => (string)$character->name, 'item' => $values['item'], 'quantity'=>$quantity]);
-        return $payout;
+                    if ( Payout::where( 'character_name', $character->name )->where( 'item', $item )->exists() ) {
+                         $payout = Payout::where( 'character_name', $character->name )->where('item', $item )->first();
+                         $payout->quantity = $payout->quantity + $quantity;
+                         $payout->save();
+                    } else {
+                         $payout = Payout::updateOrCreate(
+                              [ 'character_name' => (string) $character->name, 'item' => $item ],
+                              [ 'quantity'=>$quantity ]
+                         );
+                    }
+                    return $payout;
+               }
+          }
     }
+
     //TODO: Remove dummy number and implement market data
-    function getItemPrice($item)
-    {
+    function getItemPrice( $item ) {
         return 150;
     }
-    function getMainCharacter($character)
-    {
+
+    function getMainCharacter( $character ) {
             $user = $this->getUser($character->getKey());
             $group = $user->group;
             $main_ID = $group->main_character_id;
             return CharacterInfo::where('character_id', $main_ID)->first();
     }
-
-
 
 }
