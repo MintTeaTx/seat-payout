@@ -99,12 +99,17 @@ class PayoutController extends Controller {
     }
 
 
-    //TODO: Remove dummy number and implement market data
-    function getItemPrice( $item ) {
-            $item2ElectricBoogaloo = InvType::where( 'typeName' , $item)->first();
-            $price = $this->getHistoricalPrice($item2ElectricBoogaloo->typeID, carbon()->toDateString());
-        return $price;
-    }
+     function getItemPrice( $item ) {
+          $price_overrides = array(
+               'Blue Ice' => 273000
+          );
+          $item2ElectricBoogaloo = InvType::where( 'typeName' , $item)->first();
+          $price = $this->getHistoricalPrice($item2ElectricBoogaloo->typeID, carbon()->toDateString());
+          if ( array_key_exists( $item, $price_overrides ) ) {
+               $price->average_price = $price_overrides[ $item ];
+          }
+          return $price;
+     }
 
      function getMainCharacter( $character ) {
           if ( is_object( $character ) ) {
