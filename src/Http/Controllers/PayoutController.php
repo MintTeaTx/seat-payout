@@ -1,6 +1,7 @@
 <?php
 
 namespace Fordav3\Seat\Payout\Http\Controllers;
+use Fordav3\Seat\Payout\Models\FixedPayout;
 use Fordav3\Seat\Payout\Validation\SavePayout;
 use Illuminate\Http\Request;
 //use Illuminate\Database\Eloquent\Models;
@@ -27,8 +28,10 @@ class PayoutController extends Controller {
         Payout::truncate();
         $fleetlog = $request->fleetLog;
         $haulers = $request->haulerList;
+        $filter = explode(",",$request->filter);
+        logger()->debug('Haulers: '.$haulers);
         $logarray = explode("\n", $fleetlog);
-        $haulerarray = explode("\n", $haulers);
+        $haulerarray = explode(",", $haulers);
        // $payouts = [];
         foreach ( $logarray as $entry ) {
             $build = $this->buildPayout( $entry , $haulerarray);
@@ -50,13 +53,13 @@ class PayoutController extends Controller {
             }*/
         }
         $payouts = Payout::all();
-        return view('payout::payout', compact('payouts', 'haulerarray'));
+        return view('payout::payout', compact('payouts', 'haulerarray', 'filter'));
     }
 
     function buildPayout( $entry , $haulers)
     {
         $formats = array(
-            'window' => '#^(?<stamp>[\d:]*)?\s(?<charname>.*?)has looted\s(?<quantity>\d*)\sx\s(?<item>.*?)$#',
+            'window' => '#^(?<stamp>[\d:]*)?\s(?<charname>.*?)\shas looted\s(?<quantity>(\d|,)*)\sx\s(?<item>.*?)$#',
             'file' => '#^(?<stamp>[\d:.\s]*)?\t(?<charname>.*?)\t(?<item>.*?)\t(?<quantity>\d*)\t.*?$#'
         );
         foreach ($formats as $type => $regex) {
@@ -71,42 +74,46 @@ class PayoutController extends Controller {
                // if($item!='Blue Ice'):return;
                // endif;
                 $character_name = $values['charname'];
-                logger()->debug($character_name);
-                if($character = CharacterInfo::where('name', $character_name)->first()) :
-                $quantity = number_format(floatval($values['quantity']));
-                 $character = $this->getMainCharacter($character);
-                 $isk = $this->getItemPrice($item)->average_price * $quantity;
-                     if (Payout::where([['character_name', $character->name], ['item', $item]])->exists()) {
-                         logger()->debug($character_name.'\'s payout exists, getting and setting the payout.  '.$character->name.' looted '.$quantity.' of '.$item.' for '.$isk);
-                         $payout = Payout::where('character_name', $character->name)->where('item', $item);
+               // logger()->debug($character_name);
+                //logger()->debug($haulers);
+                if(stripos(json_encode($haulers),$character_name) !== false) : logger()->debug($character_name.' is a hauler, ignoring');break; return;
+                else: logger()->debug($character_name.' is not a hauler');
+                endif;
+                if($character = CharacterInfo::where('name', $character_name)->first()) : $name = $this->getMainCharacter($character)->name;
+                else : $name = $character_name;
+                endif;
+                    $quantity = $values['quantity'];
+                    $quantity = filter_var($quantity, FILTER_SANITIZE_NUMBER_INT);
+
+                    $isk = $this->getItemPrice($item) * $quantity;
+                    if (Payout::where([['character_name', $name], ['item', $item]])->exists()) {
+                   //      logger()->debug($character_name.'\'s payout exists, getting and setting the payout.  '.$name.' looted '.$quantity.' of '.$item.' for '.$isk);
+                         $payout = Payout::where('character_name', $name)->where('item', $item);
                          $payout->increment('quantity', $quantity);
                          $payout->increment('isk', $isk);
 
-                     } else {
-                         logger()->debug($character_name.'\'s payout doesn\'t exist.  '.$character->name.' looted '.$quantity.' of '.$item.' for '.$isk);
+                    } else {
+                  //       logger()->debug($character_name.'\'s payout doesn\'t exist.  '.$name.' looted '.$quantity.' of '.$item.' for '.$isk);
                          $payout = Payout::updateOrCreate(
-                             ['character_name' => (string)$character->name, 'item' => $item],
+                             ['character_name' => (string)$name, 'item' => $item],
                              ['quantity' => $quantity, 'isk' => $isk]
                          );
-                     }
+                    }
+             //       logger()->debug($name.' is paid out');
                     return $payout;
-                else:
-                    logger()->debug($character_name.' doesn\'t exist as a character');
-                    return;
-                endif;
+
             }
         }
     }
 
 
      function getItemPrice( $item ) {
-          $price_overrides = array(
-               'Blue Ice' => 273000
-          );
+
+         //$price_overrides = array(             'Blue Ice' => 273000         );
           $item2ElectricBoogaloo = InvType::where( 'typeName' , $item)->first();
-          $price = $this->getHistoricalPrice($item2ElectricBoogaloo->typeID, carbon()->toDateString());
-          if ( array_key_exists( $item, $price_overrides ) ) {
-               $price->average_price = $price_overrides[ $item ];
+          $price = $this->getHistoricalPrice($item2ElectricBoogaloo->typeID, carbon()->toDateString())->average_price;
+          if ($price_overrides = FixedPayout::where('item', $item)->first() ) {
+               $price = $price_overrides->isk;
           }
           return $price;
      }

@@ -8,7 +8,8 @@
 
 return [
   'payout' => [
-      'view'
+      'view',
+      'config'
   ]
 
 ];

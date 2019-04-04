@@ -19,7 +19,14 @@ return [
                 'route_segment' => 'payout',
                 'route' => 'payout.view',
                 'permission' => 'payout.view'
-            ]
+            ],
+            [
+            'name' => 'Configuration',
+            'icon' => 'fa-cog',
+            'route_segment' => 'payout',
+            'route' => 'payout.config',
+            'permission' => 'payout.config'
+        ]
         ]
 
     ]
