@@ -29,7 +29,7 @@ class PayoutController extends Controller {
         $fleetlog = $request->fleetLog;
         $haulers = $request->haulerList;
         $filter = explode(",",$request->filter);
-        logger()->debug('Haulers: '.$haulers);
+        //logger()->debug('Haulers: '.$haulers);
         $logarray = explode("\n", $fleetlog);
         $haulerarray = explode(",", $haulers);
        // $payouts = [];
@@ -76,8 +76,8 @@ class PayoutController extends Controller {
                 $character_name = $values['charname'];
                // logger()->debug($character_name);
                 //logger()->debug($haulers);
-                if(stripos(json_encode($haulers),$character_name) !== false) : logger()->debug($character_name.' is a hauler, ignoring');break; return;
-                else: logger()->debug($character_name.' is not a hauler');
+                if(stripos(json_encode($haulers),$character_name) !== false) : break; return;
+            //    else: logger()->debug($character_name.' is not a hauler');
                 endif;
                 if($character = CharacterInfo::where('name', $character_name)->first()) : $name = $this->getMainCharacter($character)->name;
                 else : $name = $character_name;
