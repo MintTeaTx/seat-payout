@@ -21,12 +21,19 @@ return [
                 'permission' => 'payout.view'
             ],
             [
-            'name' => 'Configuration',
+            'name' => 'Statistics',
             'icon' => 'fa-cog',
             'route_segment' => 'payout',
             'route' => 'payout.config',
             'permission' => 'payout.config'
-        ]
+            ],
+            [
+                'name' => 'Configuration',
+                'icon' => 'fa-cog',
+                'route_segment' => 'payout',
+                'route' => 'payout.config',
+                'permission' => 'payout.config'
+            ]
         ]
 
     ]

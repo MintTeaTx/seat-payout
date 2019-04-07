@@ -20,18 +20,27 @@ class PayoutController extends Controller {
     function getPayoutView() {
         $payouts = [];
         $haulerarray = [];
+        //TODO remove this
         Payout::truncate();
         return view('payout::payout', compact('payouts', 'haulerarray'));
     }
 
     function buildPayoutTable(SavePayout $request) {
+        //TODO: remove this
         Payout::truncate();
         $fleetlog = $request->fleetLog;
         $haulers = $request->haulerList;
-        $filter = explode(",",$request->filter);
+        //$filter = explode(",",$request->filter);
+        $filter = $request->filter;
         //logger()->debug('Haulers: '.$haulers);
         $logarray = explode("\n", $fleetlog);
         $haulerarray = explode(",", $haulers);
+
+        if(strlen($filter)>0): $filter = explode(',', $filter);
+        else: $filter = [];
+        endif;
+
+
        // $payouts = [];
         foreach ( $logarray as $entry ) {
             $build = $this->buildPayout( $entry , $haulerarray);
@@ -71,12 +80,14 @@ class PayoutController extends Controller {
                 && array_key_exists('item', $values)
             ) {
                 $item = preg_replace("/\r|\n/", "", $values['item']);
+                //$item = strtolower($item);
                // if($item!='Blue Ice'):return;
                // endif;
                 $character_name = $values['charname'];
                // logger()->debug($character_name);
                 //logger()->debug($haulers);
                 if(stripos(json_encode($haulers),$character_name) !== false) : break; return;
+                //if(strtolower(json_encode($filters)))
             //    else: logger()->debug($character_name.' is not a hauler');
                 endif;
                 if($character = CharacterInfo::where('name', $character_name)->first()) : $name = $this->getMainCharacter($character)->name;
@@ -115,7 +126,7 @@ class PayoutController extends Controller {
           if ($price_overrides = FixedPayout::where('item', $item)->first() ) {
                $price = $price_overrides->isk;
           }
-          return $price;
+          return $price * .95;
      }
 
      function getMainCharacter( $character ) {
