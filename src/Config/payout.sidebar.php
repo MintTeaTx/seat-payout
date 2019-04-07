@@ -11,11 +11,11 @@ return [
         'name'=>'Fleet Payout Calculator',
         'permission' => 'payout.view',
         'route_segment' => 'payout',
-        'icon' => 'fa_calculator',
+        'icon' => 'fa-calculator',
         'entries' =>    [
             [
                 'name' => 'Payout Calculator',
-                'icon' => 'fa-rocket',
+                'icon' => 'fa-snowflake-o',
                 'route_segment' => 'payout',
                 'route' => 'payout.view',
                 'permission' => 'payout.view'
