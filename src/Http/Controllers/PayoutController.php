@@ -20,26 +20,16 @@ class PayoutController extends Controller {
     function getPayoutView() {
         $payouts = [];
         $haulerarray = [];
-        //TODO remove this
         Payout::truncate();
         return view('payout::payout', compact('payouts', 'haulerarray'));
     }
 
     function buildPayoutTable(SavePayout $request) {
-        //TODO: remove this
         Payout::truncate();
         $fleetlog = $request->fleetLog;
-        $haulers = $request->haulerList;
-        //$filter = explode(",",$request->filter);
-        $filter = $request->filter;
-        //logger()->debug('Haulers: '.$haulers);
         $logarray = explode("\n", $fleetlog);
-        $haulerarray = explode(",", $haulers);
-
-        if(strlen($filter)>0): $filter = explode(',', $filter);
-        else: $filter = [];
-        endif;
-
+        $filter = (array) $request->filter;
+        $haulerarray = (array) $request->haulerList;
 
        // $payouts = [];
         foreach ( $logarray as $entry ) {
