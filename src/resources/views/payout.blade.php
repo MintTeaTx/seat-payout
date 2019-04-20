@@ -154,7 +154,7 @@
 		var names = [];
 		var regex = [
 			// JS doesn't support named capture groups, so both regex must push names/items to the same groupIndex
-			/^[\d:]*?\s(?<name>.*?)\shas looted[\d\s]*?x\s(?<item>.*)$/gm,
+			/^[\d:]*?\s(?<name>.*?)\shas looted[\d\s,]*?x\s(?<item>.*)$/gm,
 			/^[\d\.]*?\s[\d:]*?\s(?<name>.*?\s.*?)\s(?<item>.*?)\s\d.*?$/gm
 		];
 		var fleetLog = $( '#fleetLog' ).val();
