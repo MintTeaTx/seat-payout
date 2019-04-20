@@ -104,7 +104,7 @@
 					<tbody>
 						@foreach ( $subtotals as $item => $subtotal )
 							<?php
-								$total = ( $subtotal['isk'] / 0.85 );
+								$total = ( $subtotal['isk'] / 0.95 );
 								$profit = $total - $subtotal['isk'];
 							?>
 							<tr>
@@ -152,31 +152,36 @@
 	$( '#fleetLog' ).focusout( function(){
 		var items = [];
 		var names = [];
-		var regex = /^([\d:]*)?\s(?<name>.*?)\shas looted\s((\d|,)*)\sx\s(?<item>.*?)$/gm;
+		var regex = [
+			// JS doesn't support named capture groups, so both regex must push names/items to the same groupIndex
+			/^[\d:]*?\s(?<name>.*?)\shas looted[\d\s]*?x\s(?<item>.*)$/gm,
+			/^[\d\.]*?\s[\d:]*?\s(?<name>.*?\s.*?)\s(?<item>.*?)\s\d.*?$/gm
+		];
 		var fleetLog = $( '#fleetLog' ).val();
 		let m;
-		while ( ( m = regex.exec( fleetLog ) ) !== null ) {
-			if ( m.index === regex.lastIndex ) { regex.lastIndex++; } // avoid infinite loops
-			m.forEach ( ( match, groupIndex ) => {
-				if ( ( 5 == groupIndex ) && ( ! items.includes( match ) ) ) {
-					items.push( match );
-				}
-				if ( ( 2 == groupIndex ) && ( ! names.includes( match ) ) ) {
-					names.push( match );
-				}
-			});
-		}
+		jQuery( regex ).each( function( index ) {
+			while ( ( m = this.exec( fleetLog ) ) !== null ) {
+				if ( m.index === this.lastIndex ) { this.lastIndex++; } // avoid infinite loops
+				m.forEach ( ( match, groupIndex ) => {
+					if ( ( 2 == groupIndex ) && ( ! items.includes( match ) ) ) {
+						items.push( match.trim() );
+					}
+					if ( ( 1 == groupIndex ) && ( ! names.includes( match ) ) ) {
+						names.push( match.trim() );
+					}
+				});
+			}
+		} );
 		items.sort((a, b) => a.localeCompare(b, undefined, {sensitivity: 'base'}));
+		$( '#filter' ).find( 'option' ).remove();
 		$.each( items, function( key, value ) {
 			$( '#filter' ).append( $( '<option>', { value : value } ).text( value ) );
 		});
 		names.sort((a, b) => a.localeCompare(b, undefined, {sensitivity: 'base'}));
+		$( '#haulerList' ).find( 'option' ).remove();
 		$.each( names, function( key, value ) {
 			$( '#haulerList' ).append( $( '<option>', { value : value } ).text( value ) );
 		});
 	});
-	/*$('#payouts').DataTable();
-	$('#importLog').on('click', function () {});
-	$('#payoutPasteModal').on('click', 'saveLog', function() {});*/
 </script>
 @endpush
