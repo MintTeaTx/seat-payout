@@ -33,7 +33,7 @@ class PayoutController extends Controller {
 
        // $payouts = [];
         foreach ( $logarray as $entry ) {
-            $build = $this->buildPayout( $entry , $haulerarray);
+            $build = $this->buildPayout( $entry , $haulerarray, $filter );
             /*if(is_null($build))
             {
                 break;
@@ -55,7 +55,7 @@ class PayoutController extends Controller {
         return view('payout::payout', compact('payouts', 'haulerarray', 'filter'));
     }
 
-    function buildPayout( $entry , $haulers)
+    function buildPayout( $entry , $haulers, $filter )
     {
         $formats = array(
             'window' => '#^(?<stamp>[\d:]*)?\s(?<charname>.*?)\shas looted\s(?<quantity>(\d|,)*)\sx\s(?<item>.*?)$#',
@@ -70,6 +70,7 @@ class PayoutController extends Controller {
                 && array_key_exists('item', $values)
             ) {
                 $item = preg_replace("/\r|\n/", "", $values['item']);
+                if ( ! in_array( $item, $filter ) ) return;
                 //$item = strtolower($item);
                // if($item!='Blue Ice'):return;
                // endif;
